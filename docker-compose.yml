@@ -20,8 +20,10 @@ services:
       - bored-network
     volumes:
       - userVolume:/data/db
+    ports:
+      - "27017:27017"
 
- 
+
 
   user-service:
     build:
@@ -35,6 +37,8 @@ services:
       - eureka-server
       - userDB
     restart: always
+    ports:
+      - "8097:8097"
     environment:
       - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/
       - eureka.instance.preferIpAddress=true
@@ -56,7 +60,7 @@ services:
       - eureka-server
       - user-service
     ports:
-      - 8051:8051
+      - "8051:8051"
     environment:
       eureka.client.service-url.defaultZone : http://eureka-server:8761/eureka
       EUREKA_INSTANCE_PREFERIPADDRESS : true
