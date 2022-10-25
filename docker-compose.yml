@@ -23,7 +23,39 @@ services:
     ports:
       - "27017:27017"
 
+  baladeDB:
+    container_name: baladeDB-container
+    image: mongo
+    restart: always
+    networks:
+      - bored-network
+    volumes:
+      - baladeVolume:/data/db
+    ports:
+      - "27018:27017"
 
+
+  balade-service:
+    build:
+      context: ./reservevelo-micro-balade
+      dockerfile: Dockerfile
+    container_name: balade-container
+    image: balade-image
+    networks:
+      - bored-network
+    depends_on:
+      - eureka-server
+      - baladeDB
+    restart: always
+    ports:
+      - "8096:8096"
+    environment:
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/
+      - eureka.instance.preferIpAddress=true
+      - eureka.instance.leaseRenewalIntervalInSeconds=10
+      - eureka.instance.leaseExpirationDurationInSeconds=30
+      - spring.data.mongodb.uri=mongodb://baladeDB:27017/baladeDatabase
+      - spring.data.mongodb.database=baladeDatabase
 
   user-service:
     build:
@@ -59,6 +91,7 @@ services:
     depends_on:
       - eureka-server
       - user-service
+      - balade-service
     ports:
       - "8051:8051"
     environment:
@@ -69,6 +102,9 @@ services:
       SPRING_CLOUD_GATEWAY_ROUTES_0_ID: user-service
       SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user-service:8097
       SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/**
+      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: balade-service
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://balade-service:8096
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/balade/**
 
       
 
@@ -79,6 +115,7 @@ networks:
     name: bored-network
 volumes:
   userVolume:
+  baladeVolume:
 
   
   

@@ -26,3 +26,7 @@ spring:
           uri: http://localhost:8097/
           predicates:
             - Path=/api/**
+        - id: baladeModule
+          uri: http://localhost:8096/
+          predicates:
+            - Path=/balade/**
