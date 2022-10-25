@@ -1,0 +1,80 @@
+version: "3.8"
+services:
+  eureka-server:
+    build:
+      context: ./Eureka-server/
+      dockerfile: Dockerfile
+    restart: always
+    container_name: eureka-container
+    image: eureka-image
+    ports:
+      - "8761:8761"
+    networks:
+      - bored-network
+
+  userDB:
+    container_name: userDB-container
+    image: mongo
+    restart: always
+    networks:
+      - bored-network
+    volumes:
+      - userVolume:/data/db
+
+ 
+
+  user-service:
+    build:
+      context: ./reservevelo-micro-user
+      dockerfile: Dockerfile
+    container_name: user-container
+    image: user-image
+    networks:
+      - bored-network
+    depends_on:
+      - eureka-server
+      - userDB
+    restart: always
+    environment:
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/
+      - eureka.instance.preferIpAddress=true
+      - eureka.instance.leaseRenewalIntervalInSeconds=10
+      - eureka.instance.leaseExpirationDurationInSeconds=30
+      - spring.data.mongodb.uri=mongodb://userDB:27017/userDatabase
+      - spring.data.mongodb.database=userDatabase
+
+  api-gateway:
+    build:
+      context: ./cloud-gateway-api
+      dockerfile: Dockerfile
+    container_name: api-gateway-container
+    image: api-gateway-image
+    restart: always
+    networks:
+      - bored-network
+    depends_on:
+      - eureka-server
+      - user-service
+    ports:
+      - 8051:8051
+    environment:
+      eureka.client.service-url.defaultZone : http://eureka-server:8761/eureka
+      EUREKA_INSTANCE_PREFERIPADDRESS : true
+      EUREKA_INSTANCE_LEASERENEWALINTERVALINSECONDS: 10
+      EUREKA_INSTANCE_LEASEEXPIRATIONDURATIONINSECONDS: 30
+      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user-service:8097
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/**
+
+      
+
+
+
+networks:
+  bored-network:
+    name: bored-network
+volumes:
+  userVolume:
+
+  
+  
