@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  eventDB:
+    container_name: beautiful_jackson
+    restart: always
+    image: mysql
+    networks:
+      - bored-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=rentabike
+    volumes:
+      - eventVolume:/var/lib/mysql
+networks:
+  bored-network:
+    name: bored-network
