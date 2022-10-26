@@ -19,7 +19,7 @@ import com.example.RentaBike_Event_Comment_MS.service.CommentServiceImpl;
 
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RequestMapping("/comment")
 @RestController
 public class CommentController {

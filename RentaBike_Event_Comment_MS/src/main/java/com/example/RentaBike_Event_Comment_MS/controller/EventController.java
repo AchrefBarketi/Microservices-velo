@@ -21,7 +21,7 @@ import com.example.RentaBike_Event_Comment_MS.service.EventServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RestController
 @Api(tags = "Events management")
 @RequestMapping("/event")

@@ -42,3 +42,15 @@ spring:
           uri: http://localhost:8088/
           predicates:
             - Path=/event/**,/comment/**
+        - id: maintenanceModule
+          uri: http://localhost:3000/
+          predicates:
+            - Path=/velo/**
+        - id: veloModule
+          uri: http://localhost:3001/
+          predicates:
+            - Path=/maintenance/**
+        - id: velorentModule
+          uri: http://localhost:8090/
+          predicates:
+            - Path=/velorent/**
